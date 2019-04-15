@@ -1,20 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { ObjectId } = Schema.Types;
+const Storage = require('./storage');
+//const { ObjectId } = Schema.Types;
 
 const userSchema = new Schema({
   username: String,
   password: String,
-  storage: [{
-    title: String,
-    quantity: Number,
-  }],
-  favorite: [{
-    recipeID: {
-      type: ObjectId,
-      ref: 'Recipe'
-    }
-  }]
+  preference:String,
+  storage: [{type: Schema.Types.ObjectId, ref:'Storage' }],
+  favorite: [{recipeID: String}]
 }, {
   timestamps: {
     createdAt: 'created_at',
@@ -27,6 +21,12 @@ const userSchema = new Schema({
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
+
+
+
+
+
+
 
 
 /*

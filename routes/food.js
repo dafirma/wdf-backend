@@ -1,0 +1,83 @@
+const express = require('express');
+const createError = require('http-errors');
+//const mongoose = require('mongoose');
+const router = express.Router();
+
+const User = require('../models/user');
+const Storage = require('../models/storage');
+
+const {
+  isLoggedIn,
+  isNotLoggedIn,
+  validationLoggin,
+} = require('../helpers/middlewares');
+
+router.get('/storage', isLoggedIn(),(req, res, next) => {
+  const userID = req.session.currentUser._id;
+  User.findById(userID).populate('storage')
+  .then(storageList =>{
+    res.status(200)
+    res.json(storageList)
+    console.log(storageList);
+  })
+  .catch(err =>{
+    res.json(err);
+S
+  })
+})
+
+
+
+router.post('/storage', isLoggedIn(),(req, res, next) => {
+  const userID = req.session.currentUser._id;
+  Storage.create({
+    title: req.body.title,
+    quantity: req.body.quantity
+  })
+  .then(response =>{
+    console.log(response);
+    
+    const title = req.title.body;
+    const quantity = req.quantity.body;
+    const storage = {title, quantity};
+    User.findByIdAndUpdate(userID, {$push: { storage } } )
+    .then(theResponse =>{
+      res.json(theResponse);
+      console.log(req.session.currentUser);
+    })
+    .catch(err =>{
+      res.json(err);
+    })  
+  })
+  .catch(err =>{
+    res.json(err);
+  }) 
+})
+
+
+router.put('/storage/:id',isLoggedIn(),(req, res, next) =>{
+  Storage.findByIdAndUpdate(req.params.id, req.body)
+  .then(() => {
+    res.json({message: `food storage ${req.params.id} is updated`});
+    console.log(req.session.currentUser);
+  })
+  .catch(err =>{
+    res.json(err);
+  })
+})
+
+
+router.delete('/storage/:id',isLoggedIn(), (req,res, next) =>{
+
+  Storage.findByIdAndRemove(req.params.id)
+  .then(() =>{
+    res.json({message: `food storage ${req.params.id} is removed`});
+    console.log(req.session.currentUser);
+  })
+  .catch(err =>{
+    res.json
+  })
+})
+
+
+module.exports = router;
