@@ -22,7 +22,6 @@ router.get('/storage', isLoggedIn(),(req, res, next) => {
   })
   .catch(err =>{
     res.json(err);
-S
   })
 })
 
@@ -78,6 +77,45 @@ router.delete('/storage/:id',isLoggedIn(), (req,res, next) =>{
     res.json
   })
 })
+
+// FAVORITE RECIPES
+
+router.get('/favorite', isLoggedIn(), (req,res,next)=>{
+  const userID = req.session.currentUser._id;
+  User.findById(userID)
+  .then(favoriteList =>{
+    res.status(200)
+    res.json(favoriteList)
+  })
+  .catch(err =>{
+    res.json(err);
+  })
+})
+
+router.put('/favorite', isLoggedIn(),(req,res,next) =>{
+  const userID = req.session.currentUser._id;
+  const { favorite } = req.body;
+  //console.log(req.session.currentUser.username)
+  //const favorite = {favoriteId};
+  User.findByIdAndUpdate( userID, {$push: {favorite} } )
+  .then((fav) => {
+    res.status(200)
+    res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
+    res.json(req.session.currentUser)
+    //console.log(req.session.currentUser);
+  })
+  .catch((err)=>{
+    res.json(err);
+  })
+})
+
+router.delete('/favorite', isLoggedIn(),(req, res, next) =>{
+  const userID =req.session.currentUser._id;
+
+})
+
+
+
 
 
 module.exports = router;
