@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const Storage = require('./storage');
 //const { ObjectId } = Schema.Types;
 
-const userSchema = new Schema({
+/* const userSchema = new Schema({
   username: String,
   password: String,
   preference:{type: Array, default: []} ,
@@ -14,7 +14,23 @@ const userSchema = new Schema({
     createdAt: 'created_at',
     updatedAt: 'updated_at'
   },
+}); */
+
+const userSchema = new Schema({
+  username: String,
+  password: String,
+  preference:{type: Array, default: []} ,
+  storage: [{type: Schema.Types.ObjectId, ref:'Storage' }],
+  /* favorite:[{recipeId: String }],  */
+  favorite:[{recipeId: [String] }], 
+}, {
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+  },
 });
+
+
 
 
 

@@ -36,8 +36,8 @@ router.post('/storage', isLoggedIn(),(req, res, next) => {
   .then(response =>{
     console.log(response);
     
-    const title = req.title.body;
-    const quantity = req.quantity.body;
+    const title = req.body.title;
+    const quantity = req.body.quantity;
     const storage = {title, quantity};
     User.findByIdAndUpdate(userID, {$push: { storage } } )
     .then(theResponse =>{
@@ -92,12 +92,13 @@ router.get('/favorite', isLoggedIn(), (req,res,next)=>{
   })
 })
 
-router.put('/favorite', isLoggedIn(),(req,res,next) =>{
+/* router.put('/:favorite', isLoggedIn(),(req,res,next) =>{
   const userID = req.session.currentUser._id;
-  const { favorite } = req.body;
-  //console.log(req.session.currentUser.username)
-  //const favorite = {favoriteId};
-  User.findByIdAndUpdate( userID, {$push: {favorite} } )
+  const { favoriteId } = req.body;
+  console.log(favoriteId)
+  //const favorite = {recipeId: favoriteId};
+  User.findOneAndUpdate( userID,
+    {$push: {'favorite': [{ 'recipeId': favoriteId }] } } )
   .then((fav) => {
     res.status(200)
     res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
@@ -107,10 +108,42 @@ router.put('/favorite', isLoggedIn(),(req,res,next) =>{
   .catch((err)=>{
     res.json(err);
   })
-})
+}) */
+
+router.put('/:favorite', isLoggedIn(),(req,res,next) =>{
+  const userID = req.session.currentUser._id;
+  //const { favoriteId } = req.body;
+  console.log(req.session.currentUser._id)
+  //const favorite = {recipeId: favoriteId};
+  User.findByIdAndUpdate( userID, {$push:{'favorite.0.recipeId': req.body.favoriteId}})
+  .then((fav) => {
+    res.status(200)
+    res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
+    res.json(req.session.currentUser)
+    //console.log(req.session.currentUser);
+  })
+  .catch((err)=>{
+    res.json(err);
+  })
+}) 
+
+
+
 
 router.delete('/favorite', isLoggedIn(),(req, res, next) =>{
   const userID =req.session.currentUser._id;
+  User.findByIdAndUpdate( userID, {$pull:{'favorite.0.recipeId': req.body.favoriteId}})
+  .then((fav) => {
+    res.status(200)
+    //res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
+    res.json(fav)
+    //console.log(req.session.currentUser);
+  })
+  .catch((err)=>{
+    res.json(err);
+  })
+  
+    
 
 })
 
