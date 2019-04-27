@@ -25,8 +25,6 @@ router.get('/storage', isLoggedIn(),(req, res, next) => {
   })
 })
 
-
-
 router.post('/storage', isLoggedIn(),(req, res, next) => {
   const userID = req.session.currentUser._id;
   Storage.create({
