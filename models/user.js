@@ -22,7 +22,7 @@ const userSchema = new Schema({
   preference:{type: Array, default: []} ,
   storage: [{type: Schema.Types.ObjectId, ref:'Storage' }],
   /* favorite:[{recipeId: String }],  */
-  favorite:[{recipeId: [String] }], 
+  favorites:{type: Array, default: []}, 
 }, {
   timestamps: {
     createdAt: 'created_at',

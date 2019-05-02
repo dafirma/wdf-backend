@@ -110,10 +110,11 @@ router.get('/favorite', isLoggedIn(), (req,res,next)=>{
 
 router.put('/:favorite', isLoggedIn(),(req,res,next) =>{
   const userID = req.session.currentUser._id;
-  //const { favoriteId } = req.body;
+  const favorites = req.body.favoriteId;
+  //const favorites = {favorites: favoriteId}
   console.log(req.session.currentUser._id)
   //const favorite = {recipeId: favoriteId};
-  User.findByIdAndUpdate( userID, {$push:{'favorite.0.recipeId': req.body.favoriteId}})
+  User.findByIdAndUpdate( userID, {$push:{favorites:favorites}})
   .then((fav) => {
     res.status(200)
     res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
