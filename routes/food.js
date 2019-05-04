@@ -83,7 +83,7 @@ router.get('/favorite', isLoggedIn(), (req,res,next)=>{
   User.findById(userID)
   .then(favoriteList =>{
     res.status(200)
-    res.json(favoriteList)
+    res.json(favoriteList.favorites)
   })
   .catch(err =>{
     res.json(err);
@@ -108,17 +108,43 @@ router.get('/favorite', isLoggedIn(), (req,res,next)=>{
   })
 }) */
 
+router.put ('/word', isLoggedIn(),(req,res,next)=>{
+  const userID = req.session.currentUser._id;
+  const word = req.body.word;
+  console.log(word)
+  User.findByIdAndUpdate(userID, {$push:{wordTest:word}})
+  .then((test)=>{
+    console.log(test)
+  })
+  .catch((error)=>{
+    console.log(error)
+  })
+})
+
+router.post('/word', isLoggedIn(),(req,res,next)=>{
+  const userID = req.session.currentUser._id;
+  const wordDelete = req.body.word;
+  console.log(wordDelete)
+  User.findByIdAndUpdate(userID, {$pull: {wordTest:wordDelete}})
+  .then((test)=>{
+    console.log(test)
+  }).catch((error)=>{
+    console.log(error);
+  })
+})
+
 router.put('/:favorite', isLoggedIn(),(req,res,next) =>{
   const userID = req.session.currentUser._id;
   const favorites = req.body.favoriteId;
   //const favorites = {favorites: favoriteId}
-  console.log(req.session.currentUser._id)
+  //console.log(req.session.currentUser._id)
   //const favorite = {recipeId: favoriteId};
+  console.log(favorites)
   User.findByIdAndUpdate( userID, {$push:{favorites:favorites}})
   .then((fav) => {
-    res.status(200)
+    //res.status(200)
     res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
-    res.json(req.session.currentUser)
+    res.json(fav.data)
     //console.log(req.session.currentUser);
   })
   .catch((err)=>{
@@ -129,18 +155,19 @@ router.put('/:favorite', isLoggedIn(),(req,res,next) =>{
 
 
 
-router.delete('/favorite', isLoggedIn(),(req, res, next) =>{
-  const userID =req.session.currentUser._id;
-  User.findByIdAndUpdate( userID, {$pull:{'favorite.0.recipeId': req.body.favoriteId}})
+router.post('/favorite', isLoggedIn(),(req, res, next) =>{
+  const userID = req.session.currentUser;
+  const {favoriteId} = req.body;
+  console.log(favoriteId)
+   User.findByIdAndUpdate( userID, { $pull:{ favorites:{'uri': favoriteId }}})
   .then((fav) => {
-    res.status(200)
-    //res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
+    //res.status(200);
+    res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
     res.json(fav)
-    //console.log(req.session.currentUser);
   })
   .catch((err)=>{
     res.json(err);
-  })
+  }) 
   
     
 

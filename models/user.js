@@ -19,6 +19,7 @@ const Storage = require('./storage');
 const userSchema = new Schema({
   username: String,
   password: String,
+  wordTest: String,
   preference:{type: Array, default: []} ,
   storage: [{type: Schema.Types.ObjectId, ref:'Storage' }],
   /* favorite:[{recipeId: String }],  */
