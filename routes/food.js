@@ -12,9 +12,10 @@ const {
   validationLoggin,
 } = require('../helpers/middlewares');
 
+
 router.get('/storage', isLoggedIn(),(req, res, next) => {
   const userID = req.session.currentUser._id;
-  User.findById(userID).populate('storage')
+  User.findById(userID)
   .then(storageList =>{
     res.status(200)
     res.json(storageList)
@@ -25,30 +26,35 @@ router.get('/storage', isLoggedIn(),(req, res, next) => {
   })
 })
 
+router.put('/:storage', isLoggedIn(),(req, res, next) => {
+  const userID = req.session.currentUser._id;
+  const {menu} =req.body;
+  //console.log(menu.name);
+  //console.log(menu[0].name)
+  User.findByIdAndUpdate(userID, {$push:{storage:menu}})
+  .then((food)=>{
+    res.json(food)
+  })
+  .catch((error)=>{
+    res.json(error)
+  }) 
+
+})
+
 router.post('/storage', isLoggedIn(),(req, res, next) => {
   const userID = req.session.currentUser._id;
-  Storage.create({
-    title: req.body.title,
-    quantity: req.body.quantity
+  const {foodName} =req.body;
+  console.log(foodName);
+  //console.log(menu.name);
+  //console.log(menu[0].name)
+ User.findByIdAndUpdate(userID, {$pull:{storage:{'name': foodName}}})
+  .then((food)=>{
+    res.json(food)
   })
-  .then(response =>{
-    console.log(response);
-    
-    const title = req.body.title;
-    const quantity = req.body.quantity;
-    const storage = {title, quantity};
-    User.findByIdAndUpdate(userID, {$push: { storage } } )
-    .then(theResponse =>{
-      res.json(theResponse);
-      console.log(req.session.currentUser);
-    })
-    .catch(err =>{
-      res.json(err);
-    })  
-  })
-  .catch(err =>{
-    res.json(err);
-  }) 
+  .catch((error)=>{
+    res.json(error)
+  })  
+
 })
 
 
@@ -64,8 +70,8 @@ router.put('/storage/:id',isLoggedIn(),(req, res, next) =>{
 })
 
 
-router.delete('/storage/:id',isLoggedIn(), (req,res, next) =>{
-
+router.post('/storage/:id',isLoggedIn(), (req,res, next) =>{
+//$pull
   Storage.findByIdAndRemove(req.params.id)
   .then(() =>{
     res.json({message: `food storage ${req.params.id} is removed`});

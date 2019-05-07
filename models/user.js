@@ -21,7 +21,7 @@ const userSchema = new Schema({
   password: String,
   wordTest: String,
   preference:{type: Array, default: []} ,
-  storage: [{type: Schema.Types.ObjectId, ref:'Storage' }],
+  storage: {type: Array, default: []},
   /* favorite:[{recipeId: String }],  */
   favorites:{type: Array, default: []}, 
 }, {
