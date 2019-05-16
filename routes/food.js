@@ -26,21 +26,116 @@ router.get('/storage', isLoggedIn(),(req, res, next) => {
   })
 })
 
-router.put('/:storage', isLoggedIn(),(req, res, next) => {
-  const userID = req.session.currentUser._id;
-  const {menu} =req.body;
-  //console.log(menu.name);
-  //console.log(menu[0].name)
-  User.findByIdAndUpdate(userID, {$push:{storage:menu}})
-  .then((food)=>{
-    res.json(food)
-  })
-  .catch((error)=>{
-    res.json(error)
-  }) 
+//CREATE OK
 
+router.put('/storage/new', isLoggedIn(),async(req, res, next) => {
+  try{
+    const userID = req.session.currentUser._id;
+   const {food} =req.body;
+   //const {title, quantity} = req.body;
+   //const food = {title, quantity};
+   const tempT = food.title;
+   const tempQ = food.quantity;
+  // const tempQ = food.quantity;
+   //const tempT = food.name;
+   //console.log(food);
+   console.log(tempQ);
+   console.log(tempT);
+   console.log('food',food)
+   //console.log(req.session.currentUser.storage);
+   const userStorage = req.session.currentUser.storage;
+   console.log('user',userStorage)
+   console.log(req.session.currentUser)
+   let resp = await userStorage.some(el => el.title === tempT);
+   //let index = await userStorage.findIndex(el => el.title === tempT);
+   //let newQnt = userStorage[index].quantity + tempQ;
+
+   console.log('resp',resp);
+   //console.log(newQnt)
+   if(resp === true){
+     let newStorage = await User.findByIdAndUpdate(userID, 
+       { $set:{'storage.$[food].quantity':tempQ}},  { arrayFilters:[ { 'food.title':tempT } ] } )
+       .then(test =>{
+         console.log('new',test)
+         res.json(test)
+
+       })
+  }
+   else {
+      let newStorageUp= await User.findByIdAndUpdate(userID,
+        {$push: {storage: {title: tempT, quantity: tempQ}}, new:true})
+      res.json(newStorageUp)
+   } 
+  } catch(error){
+    console.log(error)
+  }
 })
+ // veririfcar porque esta saltando a condicao de false
 
+
+
+router.put('/storage', isLoggedIn(),async(req, res, next) => {
+try{
+
+  const userID = req.session.currentUser._id;
+  const {name, quantity} =req.body;
+  const menu ={name, quantity};
+  const tempT = menu.name;
+  const tempQ = menu.quantity;
+  // para trocar deve ser primeiro o campo que voce precisa trocar e depois o campo de comparacao.
+  let newStorage = await User.findByIdAndUpdate(userID,  { $set:{'storage.$[food].quantity':tempQ}},{ arrayFilters:[{'food.name':tempT}], new:true } )
+  console.log('new',newStorage)
+  res.json(newStorage)
+} catch(error){
+  console.log(error)
+}}
+)
+
+
+//UPDATE
+
+router.put('/storage', isLoggedIn(),async(req, res, next) => {
+  try{
+  
+    const userID = req.session.currentUser._id;
+    const {menu} =req.body;
+    //const menu ={title, quantity};
+    const tempT = menu.title;
+    const tempQ = menu.quantity;
+    console.log(menu)
+    console.log('title',tempT)
+    console.log('qnt', tempQ)
+    // para trocar deve ser primeiro o campo que voce precisa trocar e depois o campo de comparacao.
+   // let newStorage = await User.findByIdAndUpdate(userID,  { $set:{'storage.$[food].quantity':tempQ}},{ arrayFilters:[{'food.title':tempT}], new:true } )
+    //console.log('new',newStorage)
+   // res.json(newStorage)
+ } catch(error){
+   console.log(error)
+  }}
+  )
+
+
+//ok
+/* 
+router.put('/storage', isLoggedIn(),async(req, res, next) => {
+try{
+
+  const userID = req.session.currentUser._id;
+  const {title, quantity} =req.body;
+  const menu ={title, quantity};
+  const tempT = menu.title;
+  const tempQ = menu.quantity;
+  // para trocar deve ser primeiro o campo que voce precisa trocar e depois o campo de comparacao.
+  let newStorage = await User.findByIdAndUpdate(userID,  { $set:{'storage.$[food].quantity':tempQ}},{ arrayFilters:[{'food.title':tempT}], new:true } )
+  console.log('new',newStorage)
+  res.json(newStorage)
+} catch(error){
+  console.log(error)
+}}
+)
+ */
+
+//DELETE
 router.post('/storage', isLoggedIn(),(req, res, next) => {
   const userID = req.session.currentUser._id;
   const {foodName} =req.body;
@@ -57,7 +152,7 @@ router.post('/storage', isLoggedIn(),(req, res, next) => {
 
 })
 
-
+/* 
 router.put('/storage/:id',isLoggedIn(),(req, res, next) =>{
   Storage.findByIdAndUpdate(req.params.id, req.body)
   .then(() => {
@@ -80,7 +175,7 @@ router.post('/storage/:id',isLoggedIn(), (req,res, next) =>{
   .catch(err =>{
     res.json
   })
-})
+}) */
 
 // FAVORITE RECIPES
 

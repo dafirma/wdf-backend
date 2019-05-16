@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const User = require('./user')
 
 const storageSchema = new Schema({
-  title: String,
+  name: String,
   quantity: Number,
   user: {type: Schema.Types.ObjectId, ref: 'User'}
 });
