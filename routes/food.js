@@ -55,15 +55,17 @@ router.put('/storage/new', isLoggedIn(),async(req, res, next) => {
    if(resp === true){
      let newStorage = await User.findByIdAndUpdate(userID, 
        { $set:{'storage.$[food].quantity':tempQ}},  { arrayFilters:[ { 'food.title':tempT } ] } )
-       .then(test =>{
-         console.log('new',test)
-         res.json(test)
-
+       .then(user =>{
+         req.session.currentUser = user
+         console.log('new',user)
+         res.json(user)
+// refractor
        })
   }
    else {
-      let newStorageUp= await User.findByIdAndUpdate(userID,
+      let newStorageUp = await User.findByIdAndUpdate(userID,
         {$push: {storage: {title: tempT, quantity: tempQ}}, new:true})
+        req.session.currentUser = newStorageUp
       res.json(newStorageUp)
    } 
   } catch(error){
@@ -183,6 +185,7 @@ router.get('/favorite', isLoggedIn(), (req,res,next)=>{
   const userID = req.session.currentUser._id;
   User.findById(userID)
   .then(favoriteList =>{
+    req.session.currentUser.favorites = favoriteList.favorites
     res.status(200)
     res.json(favoriteList.favorites)
   })
@@ -209,49 +212,28 @@ router.get('/favorite', isLoggedIn(), (req,res,next)=>{
   })
 }) */
 
-router.put ('/word', isLoggedIn(),(req,res,next)=>{
-  const userID = req.session.currentUser._id;
-  const word = req.body.word;
-  console.log(word)
-  User.findByIdAndUpdate(userID, {$push:{wordTest:word}})
-  .then((test)=>{
-    console.log(test)
-  })
-  .catch((error)=>{
-    console.log(error)
-  })
-})
 
-router.post('/word', isLoggedIn(),(req,res,next)=>{
-  const userID = req.session.currentUser._id;
-  const wordDelete = req.body.word;
-  console.log(wordDelete)
-  User.findByIdAndUpdate(userID, {$pull: {wordTest:wordDelete}})
-  .then((test)=>{
-    console.log(test)
-  }).catch((error)=>{
-    console.log(error);
-  })
-})
-
-router.put('/:favorite', isLoggedIn(),(req,res,next) =>{
+router.put('/favorite', isLoggedIn(),(req,res,next) =>{
   const userID = req.session.currentUser._id;
   const favorites = req.body.favoriteId;
   //const favorites = {favorites: favoriteId}
   //console.log(req.session.currentUser._id)
   //const favorite = {recipeId: favoriteId};
-  console.log(favorites)
-  User.findByIdAndUpdate( userID, {$push:{favorites:favorites}})
-  .then((fav) => {
-    //res.status(200)
-    res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
-    res.json(fav.data)
+  //console.log(favorites)
+  User.findByIdAndUpdate( userID, 
+    {$push:{favorites:favorites}}, {new:true})
+    .then(fav =>{
+       //res.status(200)
+    console.log('ok',fav)
+    //res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
+    res.json(fav.favorites)
     //console.log(req.session.currentUser);
+    })
+    .catch(err =>{
+      res.json(err)
+    })
   })
-  .catch((err)=>{
-    res.json(err);
-  })
-}) 
+
 
 
 
@@ -260,7 +242,7 @@ router.post('/favorite', isLoggedIn(),(req, res, next) =>{
   const userID = req.session.currentUser;
   const {favoriteId} = req.body;
   console.log(favoriteId)
-   User.findByIdAndUpdate( userID, { $pull:{ favorites:{'uri': favoriteId }}})
+  User.findByIdAndUpdate( userID, { $pull:{ favorites:{'uri': favoriteId }}})
   .then((fav) => {
     //res.status(200);
     res.json({message: `favorite recipe user ${username} is updated. ${favorite}`, fav })
@@ -270,8 +252,8 @@ router.post('/favorite', isLoggedIn(),(req, res, next) =>{
     res.json(err);
   }) 
   
-    
-
+  
+  
 })
 
 
@@ -279,3 +261,28 @@ router.post('/favorite', isLoggedIn(),(req, res, next) =>{
 
 
 module.exports = router;
+
+// router.put ('/word', isLoggedIn(),(req,res,next)=>{
+//   const userID = req.session.currentUser._id;
+//   const word = req.body.word;
+//   console.log(word)
+//   User.findByIdAndUpdate(userID, {$push:{wordTest:word}})
+//   .then((test)=>{
+//     console.log(test)
+//   })
+//   .catch((error)=>{
+//     console.log(error)
+//   })
+// })
+
+// router.post('/word', isLoggedIn(),(req,res,next)=>{
+//   const userID = req.session.currentUser._id;
+//   const wordDelete = req.body.word;
+//   console.log(wordDelete)
+//   User.findByIdAndUpdate(userID, {$pull: {wordTest:wordDelete}})
+//   .then((test)=>{
+//     console.log(test)
+//   }).catch((error)=>{
+//     console.log(error);
+//   })
+// })
