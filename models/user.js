@@ -18,14 +18,14 @@ const Storage = require('./storage');
 
 const userSchema = new Schema({
   username: String,
-  password: String,
+  password: String, 
   wordTest: String,
   preference:{type: Array, default: []} ,
   storage: {type: Array, default: []},
   /* favorite:[{recipeId: String }],  */
   favorites:{type: Array, default: []}, 
 }, {
-  timestamps: {
+  timestamps: { 
     createdAt: 'created_at',
     updatedAt: 'updated_at'
   },
