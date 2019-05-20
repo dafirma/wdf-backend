@@ -30,24 +30,18 @@ router.get('/storage', isLoggedIn(),(req, res, next) => {
 
 router.put('/storage/new', isLoggedIn(),async(req, res, next) => {
   try{
-    const userID = req.session.currentUser._id;
+   const userID = req.session.currentUser._id;
    const {food} =req.body;
-   //const {title, quantity} = req.body;
-   //const food = {title, quantity};
    const tempT = food.title;
    const tempQ = food.quantity;
    const tempUn = food.unity
    console.log(tempQ);
    console.log(tempT);
    console.log('food',food)
-   //console.log(req.session.currentUser.storage);
    const userStorage = req.session.currentUser.storage;
    console.log('user',userStorage)
    console.log(req.session.currentUser)
    let resp = await userStorage.some(el => el.title === tempT);
-   //let index = await userStorage.findIndex(el => el.title === tempT);
-   //let newQnt = userStorage[index].quantity + tempQ;
-
    console.log('resp',resp);
    //console.log(newQnt)
    if(resp === true){
