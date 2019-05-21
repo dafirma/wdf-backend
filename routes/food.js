@@ -20,7 +20,7 @@ router.get('/storage', isLoggedIn(),(req, res, next) => {
     req.session.currentUser = user;
     res.status(200)
     res.json(user)
-    console.log(user);
+
   })
   .catch(err =>{
     res.json(err);
@@ -36,23 +36,14 @@ router.put('/storage/new', isLoggedIn(),async(req, res, next) => {
    const tempT = food.title;
    const tempQ = food.quantity;
    const tempUn = food.unity
-   console.log(tempQ);
-   console.log(tempT);
-   console.log('food',food)
    const userStorage = req.session.currentUser.storage;
-   console.log('user',userStorage)
-  // console.log(req.session.currentUser)
    let resp = await userStorage.some(el => el.title === tempT);
-   console.log('resp',resp);
-   //console.log(newQnt)
    if(resp === true){
      let newStorage = await User.findByIdAndUpdate(userID, 
        { $set:{'storage.$[food].quantity':tempQ, 'storage.$[food].unity':tempUn}},  
        { arrayFilters:[ { 'food.title':tempT } ] } )
          req.session.currentUser = newStorage
-         console.log('new',newStorage.storage)
          res.json(newStorageUp.storage)
-      // refractor
    }
    else {
       let newStorageUp = await User.findByIdAndUpdate(userID,
@@ -61,26 +52,10 @@ router.put('/storage/new', isLoggedIn(),async(req, res, next) => {
       res.json(newStorageUp.storage)
    }  
   } catch(error){
-    console.log(error)
   }
 }
 )
-/* 
-router.put('/storage', isLoggedIn(),async(req, res, next) => {
-try{
 
-  const userID = req.session.currentUser._id;
-  const {name, quantity, type} =req.body;
-  const menu ={name, quantity};
-  const tempT = menu.name;
-  const tempQ = menu.quantity;
-  let newStorage = await User.findByIdAndUpdate(userID,  { $set:{'storage.$[food].quantity':tempQ}},{ arrayFilters:[{'food.name':tempT}], new:true } )
-  console.log('new',newStorage)
-  res.json(newStorage)
-} catch(error){
-  console.log(error)
-}}
-) */
 
 //DELETE
 router.post('/storage', isLoggedIn(),async(req, res, next) => {
@@ -132,10 +107,8 @@ router.put('/favorite', isLoggedIn(),(req,res,next) =>{
    try{
     const userID = req.session.currentUser;
     const {favoriteId} = req.body;
-    console.log('fav',req.session.currentUser.favorites)
     let newFavorite = await User.findByIdAndUpdate( userID, { $pull:{ favorites:{'uri': favoriteId.uri }}, new:true})
-      res.json(newFavorite)
-      console.log('ok')
+    res.json(newFavorite)
    }
     catch(err){
       res.json(err);
