@@ -15,11 +15,14 @@ const {
 
 router.get('/storage', isLoggedIn(),(req, res, next) => {
   const userID = req.session.currentUser._id;
+  console.log('fsdf')
   User.findById(userID)
   .then(user =>{
-    req.session.currentUser = user;
+   // req.session.currentUser = user;
     res.status(200)
     res.json(user)
+    console.log('/get/storage',req.session.currentUser.storage)
+    console.log('novo')
 
   })
   .catch(err =>{
@@ -45,25 +48,25 @@ router.put('/storage/new', isLoggedIn(),async(req, res, next) => {
 
     //ok 
     let newStorage = await User.findByIdAndUpdate(userID, 
-      { $set:{'storage.$[food].quantity':tempQ}},  { arrayFilters:[ { 'food.title':tempT } ] } )
+      { $set:{'storage.$[food].quantity':tempQ}},  { arrayFilters:[ { 'food.title':tempT } ] })
         req.session.currentUser = newStorage
         console.log('new',newStorage.storage)
-        res.json(newStorage)
- }
-   else {
-      let newStorageUp = await User.findByIdAndUpdate(userID,
+        res.json(req.session.currentUser)
+      }
+     else {
+     let newStorageUp= await User.findByIdAndUpdate(userID,
         {$push: {storage: {title: tempT, quantity: tempQ, unity: tempUn}}, new:true})
         req.session.currentUser = newStorageUp;
         console.log('variable',newStorageUp.storage)
         console.log('user', req.session.currentUser.storage)
+        res.json(newStorageUp)
         //req.session.currentUser = newStorageUp
       //res.json(newStorageUp.storage)
    }  
   } catch(error){
     console.log(error)
   }
-}
-)
+})
 
 
 //DELETE
